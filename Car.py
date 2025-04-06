@@ -20,7 +20,7 @@ class Car:
         self.max_speed = max_speed
 
     def drive(self):
-        print(f"Driving a generic car at {self.max_speed} km/h.")
+        print(f"Driving a generic car.")
 
 
 class Vehicle(Car):
@@ -31,7 +31,7 @@ class Vehicle(Car):
         self.color = color
 
     def drive(self):
-        print(f"Driving a {self.color} {self.vehicle_class.value} vehicle with {self.wheel_drive.value} drive.")
+        print(f"Driving a Vehicle.")
 
 
 class Cargo(Car):
@@ -42,7 +42,7 @@ class Cargo(Car):
         self.axles_amount = axles_amount
 
     def drive(self):
-        print(f"Driving a cargo truck with {self.tonnage}t capacity and {self.axles_amount} axles.")
+        print(f"Driving a Cargo.")
 
 
 class Tank(Car):
@@ -53,7 +53,7 @@ class Tank(Car):
         self.crew_size = crew_size
 
     def drive(self):
-        print(f"Driving a tank with {self.projectile_caliber} caliber and crew of {self.crew_size}.")
+        print(f"Driving a Tank.")
 
 
 # Vehicles
@@ -64,6 +64,9 @@ class Tesla(Vehicle):
                          vehicle_class=VehicleClass.SEDAN,
                          color="red")
 
+    def drive(self):
+        print(f"Driving a Tesla.")
+
 
 class Audi(Vehicle):
     def __init__(self):
@@ -71,6 +74,9 @@ class Audi(Vehicle):
                          wheel_drive=VehicleWheelDrive.BACK,
                          vehicle_class=VehicleClass.COUPE,
                          color="black")
+
+    def drive(self):
+        print(f"Driving an Audi.")
 
 
 class Honda(Vehicle):
@@ -80,6 +86,9 @@ class Honda(Vehicle):
                          vehicle_class=VehicleClass.HATCHBACK,
                          color="white")
 
+    def drive(self):
+        print(f"Driving a Honda.")
+
 
 # Cargo
 class Volvo(Cargo):
@@ -87,17 +96,26 @@ class Volvo(Cargo):
         super().__init__(weight=8000, length=7.5, max_speed=120,
                          tonnage=15, tank_volume=500, axles_amount=4)
 
+    def drive(self):
+        print(f"Driving a Volvo.")
+
 
 class Man(Cargo):
     def __init__(self):
         super().__init__(weight=7700, length=7.2, max_speed=115,
                          tonnage=16, tank_volume=480, axles_amount=5)
 
+    def drive(self):
+        print(f"Driving a Man.")
+
 
 class Scania(Cargo):
     def __init__(self):
         super().__init__(weight=8200, length=7.8, max_speed=125,
                          tonnage=18, tank_volume=500, axles_amount=5)
+
+    def drive(self):
+        print(f"Driving a Scania.")
 
 
 # Tanks
@@ -106,11 +124,17 @@ class Tiger(Tank):
         super().__init__(weight=45000, length=6.1, max_speed=45,
                          projectile_caliber=88, shots_per_minute=9, crew_size=3)
 
+    def drive(self):
+        print(f"Driving a Tiger.")
+
 
 class Abrams(Tank):
     def __init__(self):
         super().__init__(weight=50000, length=7.2, max_speed=50,
                          projectile_caliber=120, shots_per_minute=8, crew_size=4)
+
+    def drive(self):
+        print(f"Driving an Abrams.")
 
 
 class Merkava(Tank):
@@ -118,52 +142,45 @@ class Merkava(Tank):
         super().__init__(weight=55000, length=7.5, max_speed=60,
                          projectile_caliber=120, shots_per_minute=9, crew_size=4)
 
+    def drive(self):
+        print(f"Driving a Merkava.")
+
 
 class AbstractCarFactory(ABC):
     @abstractmethod
-    def create_car(self, brand: str) -> Car:
+    def create_vehicle(self) -> Vehicle:
+        pass
+
+    @abstractmethod
+    def create_cargo(self) -> Cargo:
+        pass
+
+    @abstractmethod
+    def create_tank(self) -> Tank:
         pass
 
 
-class VehicleFactory(AbstractCarFactory):
-    def create_car(self, brand: str):
-        if brand == "Tesla":
-            return Tesla()
-        elif brand == "Audi":
-            return Audi()
-        elif brand == "Honda":
-            return Honda()
-        raise ValueError("Unknown vehicle brand")
+class DefaultCarFactory(AbstractCarFactory):
+    def create_vehicle(self):
+        return Audi()  # Honda, Tesla
+
+    def create_cargo(self):
+        return Volvo()  # Man, Scania
+
+    def create_tank(self):
+        return Tiger()  # Abrams, Merkava
 
 
-class CargoFactory(AbstractCarFactory):
-    def create_car(self, brand: str):
-        if brand == "Scania":
-            return Scania()
-        elif brand == "Volvo":
-            return Volvo()
-        elif brand == "Man":
-            return Man()
-        raise ValueError("Unknown cargo brand")
+def client(factory: AbstractCarFactory):
+    vehicle = factory.create_vehicle()
+    cargo = factory.create_cargo()
+    tank = factory.create_tank()
 
-
-class TankFactory(AbstractCarFactory):
-    def create_car(self, brand: str):
-        if brand == "Tiger":
-            return Tiger()
-        elif brand == "Abrams":
-            return Abrams()
-        elif brand == "Merkava":
-            return Merkava()
-        raise ValueError("Unknown tank brand")
-
-
-def client_code(factory: AbstractCarFactory, brand: str):
-    car = factory.create_car(brand)
-    car.drive()
+    vehicle.drive()
+    cargo.drive()
+    tank.drive()
 
 
 if __name__ == "__main__":
-    client_code(VehicleFactory(), "Tesla")
-    client_code(CargoFactory(), "Volvo")
-    client_code(TankFactory(), "Merkava")
+    factory = DefaultCarFactory()
+    client(factory)
