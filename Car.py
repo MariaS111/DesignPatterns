@@ -20,7 +20,9 @@ class Car:
         self.max_speed = max_speed
 
     def drive(self):
-        print(f"Driving a generic car.")
+        print(f"Driving a {self.__class__.__name__} "
+              f"(Weight: {self.weight}, Length: {self.length}, "
+              f"Max Speed: {self.max_speed}km/h)")
 
 
 class Vehicle(Car):
@@ -31,7 +33,9 @@ class Vehicle(Car):
         self.color = color
 
     def drive(self):
-        print(f"Driving a Vehicle.")
+        print(f"Driving a {self.__class__.__name__} "
+              f"(Color: {self.color}, Class: {self.vehicle_class.value}, "
+              f"Wheel Drive: {self.wheel_drive.value}, Max Speed: {self.max_speed}km/h)")
 
 
 class Cargo(Car):
@@ -42,7 +46,9 @@ class Cargo(Car):
         self.axles_amount = axles_amount
 
     def drive(self):
-        print(f"Driving a Cargo.")
+        print(f"Driving a {self.__class__.__name__} "
+              f"(Tonnage: {self.tonnage}t, Tank Volume: {self.tank_volume}L, "
+              f"Axles: {self.axles_amount}, Max Speed: {self.max_speed}km/h)")
 
 
 class Tank(Car):
@@ -53,7 +59,9 @@ class Tank(Car):
         self.crew_size = crew_size
 
     def drive(self):
-        print(f"Driving a Tank.")
+        print(f"Driving a {self.__class__.__name__} "
+              f"(Caliber: {self.projectile_caliber}mm, RPM: {self.shots_per_minute}, "
+              f"Crew: {self.crew_size}, Max Speed: {self.max_speed}km/h)")
 
 
 # Vehicles
@@ -64,9 +72,6 @@ class Tesla(Vehicle):
                          vehicle_class=VehicleClass.SEDAN,
                          color="red")
 
-    def drive(self):
-        print(f"Driving a Tesla.")
-
 
 class Audi(Vehicle):
     def __init__(self):
@@ -74,9 +79,6 @@ class Audi(Vehicle):
                          wheel_drive=VehicleWheelDrive.BACK,
                          vehicle_class=VehicleClass.COUPE,
                          color="black")
-
-    def drive(self):
-        print(f"Driving an Audi.")
 
 
 class Honda(Vehicle):
@@ -86,9 +88,6 @@ class Honda(Vehicle):
                          vehicle_class=VehicleClass.HATCHBACK,
                          color="white")
 
-    def drive(self):
-        print(f"Driving a Honda.")
-
 
 # Cargo
 class Volvo(Cargo):
@@ -96,26 +95,17 @@ class Volvo(Cargo):
         super().__init__(weight=8000, length=7.5, max_speed=120,
                          tonnage=15, tank_volume=500, axles_amount=4)
 
-    def drive(self):
-        print(f"Driving a Volvo.")
-
 
 class Man(Cargo):
     def __init__(self):
         super().__init__(weight=7700, length=7.2, max_speed=115,
                          tonnage=16, tank_volume=480, axles_amount=5)
 
-    def drive(self):
-        print(f"Driving a Man.")
-
 
 class Scania(Cargo):
     def __init__(self):
         super().__init__(weight=8200, length=7.8, max_speed=125,
                          tonnage=18, tank_volume=500, axles_amount=5)
-
-    def drive(self):
-        print(f"Driving a Scania.")
 
 
 # Tanks
@@ -124,26 +114,17 @@ class Tiger(Tank):
         super().__init__(weight=45000, length=6.1, max_speed=45,
                          projectile_caliber=88, shots_per_minute=9, crew_size=3)
 
-    def drive(self):
-        print(f"Driving a Tiger.")
-
 
 class Abrams(Tank):
     def __init__(self):
         super().__init__(weight=50000, length=7.2, max_speed=50,
                          projectile_caliber=120, shots_per_minute=8, crew_size=4)
 
-    def drive(self):
-        print(f"Driving an Abrams.")
-
 
 class Merkava(Tank):
     def __init__(self):
         super().__init__(weight=55000, length=7.5, max_speed=60,
                          projectile_caliber=120, shots_per_minute=9, crew_size=4)
-
-    def drive(self):
-        print(f"Driving a Merkava.")
 
 
 class AbstractCarFactory(ABC):
@@ -171,6 +152,17 @@ class DefaultCarFactory(AbstractCarFactory):
         return Tiger()  # Abrams, Merkava
 
 
+class FirstClientCarFactory(AbstractCarFactory):
+    def create_vehicle(self):
+        return Honda()  # Audi, Tesla
+
+    def create_cargo(self):
+        return Man()  # Volvo, Scania
+
+    def create_tank(self):
+        return Abrams()   # Tiger, Merkava
+
+
 def client(factory: AbstractCarFactory):
     vehicle = factory.create_vehicle()
     cargo = factory.create_cargo()
@@ -182,5 +174,15 @@ def client(factory: AbstractCarFactory):
 
 
 if __name__ == "__main__":
-    factory = DefaultCarFactory()
-    client(factory)
+    client_number = input("Enter client number (0 - Default, 1 - FirstClient): ")
+
+    clients = {
+        0: DefaultCarFactory(),
+        1: FirstClientCarFactory()
+    }
+
+    if client_number.isdigit() and int(client_number) in clients:
+        factory = clients[int(client_number)]
+        client(factory)
+    else:
+        print("Incorrect input")
