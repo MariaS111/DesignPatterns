@@ -1,18 +1,34 @@
 from proxy import BookProxy
 from book import BookInterface
 from user import User
+from auth import AccessControl
 
 
 def client(book: BookInterface):
-    book.read()
+    info = book.get_book()
+    print(info)
 
 
 if __name__ == "__main__":
-    user1 = User("Mary", True, ["Clean Code", "Test"])
-    user2 = User("Maria", False, ["Clean Code"])
+    registered_users = {
+        1: True,
+        2: True,
+        3: False
+    }
 
-    book1 = BookProxy("Clean Code", user1)
+    permissions = {
+        1: [1, 2],
+        2: [1],
+    }
+
+    access_control = AccessControl(registered_users, permissions)
+
+    user1 = User(1, "Mary")
+    user2 = User(2, "Maria")
+
+    book1 = BookProxy(1, access_control, 1)
     client(book1)
 
-    book2 = BookProxy("Clean Code", user2)
+    book2 = BookProxy(1, access_control, 2)
     client(book2)
+
