@@ -1,5 +1,4 @@
 from book import BookInterface, Book
-from typing import Optional
 from auth import AccessControlInterface
 
 
