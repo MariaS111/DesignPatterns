@@ -1,24 +1,31 @@
 from user import User
-from abc import ABC, abstractmethod
 
 
-class AccessControlInterface(ABC):
-    @abstractmethod
+class AccessControl:
+    _instance = None
+
+    def __init__(self):
+        self._registered_users = {
+            1: True,
+            2: True,
+            3: False
+        }
+        self._permissions = {
+            1: [1, 2],
+            2: [1],
+        }
+
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
     def is_registered(self, user_id: int) -> bool:
-        pass
-
-    @abstractmethod
-    def has_access(self, user_id: int, book_id: int) -> bool:
-        pass
-
-
-class AccessControl(AccessControlInterface):
-    def __init__(self, registered_users: set[int], permissions: dict[int, list[int]]):
-        self.registered_users = registered_users
-        self.permissions = permissions
-
-    def is_registered(self, user_id: int) -> bool:
-        return self.registered_users.get(user_id, False)
+        return self._registered_users.get(user_id, False)
 
     def has_access(self, user_id: int, book_id: int) -> bool:
-        return book_id in self.permissions.get(user_id, [])
+        return book_id in self._permissions.get(user_id, [])
+
+
+ACCESS_CONTROL = AccessControl.get_instance()

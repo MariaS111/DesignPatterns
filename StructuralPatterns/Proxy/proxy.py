@@ -1,11 +1,10 @@
 from book import BookInterface, Book
-from auth import AccessControlInterface
+from auth import ACCESS_CONTROL
 
 
 class BookProxy(BookInterface):
-    def __init__(self, book_id: int, access_control: AccessControlInterface, user_id: int):
+    def __init__(self, book_id: int, user_id: int):
         self.book_id = book_id
-        self._access_control = access_control
         self._user_id = user_id
         self._book: Book | None = None
 
@@ -18,10 +17,16 @@ class BookProxy(BookInterface):
 
     def _check_access(self) -> bool:
         print(f"Checking access for user {self._user_id} to book {self.book_id}")
-        if not self._access_control.is_registered(self._user_id):
+        if not self._is_registered():
             print("User is not registered")
             return False
-        if not self._access_control.has_access(self._user_id, self.book_id):
+        if not self._has_book_access():
             print("Permission denied")
             return False
         return True
+
+    def _is_registered(self) -> bool:
+        return ACCESS_CONTROL.is_registered(self._user_id)
+
+    def _has_book_access(self) -> bool:
+        return ACCESS_CONTROL.has_access(self._user_id, self.book_id)
