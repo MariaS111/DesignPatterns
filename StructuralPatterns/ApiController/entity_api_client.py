@@ -13,10 +13,10 @@ class EntityApiClient:
         self.controller.update(entity)
 
     def get_entity(self, entity_id: int):
-        return self.controller.print(entity_id)
+        return self.controller.get_one(entity_id)
 
     def delete_entity(self, entity_id: int):
         self.controller.delete(entity_id)
 
     def get_all(self):
-        self.controller.print_many()
+        return self.controller.get_many()

@@ -5,6 +5,12 @@ from entity import SomeEntity
 class EntityApiController:
     def __init__(self):
         self._entities: Dict[int, SomeEntity] = {}
+        if not self._entities:
+            self._load_default_entities()
+
+    def _load_default_entities(self):
+        self._entities[1] = SomeEntity(id=1, name="Default Entity 1", description="Entity 1", status="active")
+        self._entities[2] = SomeEntity(id=2, name="Default Entity 2", description="Entity 2", status="inactive")
 
     def create(self, entity: SomeEntity):
         self._entities[entity.id] = entity
