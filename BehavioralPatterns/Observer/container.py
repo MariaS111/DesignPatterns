@@ -26,7 +26,7 @@ class ContainerInterface(ABC):
         pass
 
 
-class Container:
+class Container(ContainerInterface):
     def __init__(self):
         self._cars: List[Car] = []
         self._observers: List[Observer] = []
